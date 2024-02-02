@@ -73,7 +73,6 @@ if __name__ == "__main__":
             query += "), ("
         query = query.rstrip(", (")
         query += ";"
-        print(query)
         etl.insert_data_into_table(connection, query)
     
     for value in df["totalcharges"]:
