@@ -35,7 +35,7 @@ def create_column_types(df):
     column_types = []
     for column, dtype in df.dtypes.items():
         if dtype == 'float64':
-            column_types.append('FLOAT')
+            column_types.append('DECIMAL(10,2)')
         elif dtype == 'object':
             try:
                 # Try to convert the column to integers in the DataFrame
@@ -70,6 +70,7 @@ def drop_table(connection, query):
         print(f"Error: '{err}'")
 
 def insert_data_into_table(connection, query):
+    # clear the table
     """Insert data into a table"""
     cursor = connection.cursor()
     try:

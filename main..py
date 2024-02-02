@@ -1,12 +1,8 @@
 import etl
 import pandas as pd
+import numpy as np
 
 if __name__ == "__main__":
-    file_path = "data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
-    df = pd.read_csv(file_path, sep=',', header=0)
-    
-    df.columns = map(str.lower, df.columns)
-    df['totalcharges'] = pd.to_numeric(df['totalcharges'], errors='coerce')
     table_names = {
                 "customer_table": ["customerid", "gender", "seniorcitizen", "partner", "dependents"],
                 "service_table": ["customerid", "phoneservice", "multiplelines", "internetservice"],
@@ -14,8 +10,25 @@ if __name__ == "__main__":
                 "streaming_table": ["customerid", "streamingtv", "streamingmovies"],
                 "billing_table": ["customerid", "contract", "paperlessbilling", "paymentmethod", "monthlycharges", "totalcharges", "churn"]
     }
-   
-    #create connection to database
+    
+    file_path = "data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
+    df = pd.read_csv(file_path, sep=',', header=0)
+    df.columns = map(str.lower, df.columns)
+    
+    #remove duplicates
+    for table, columns in table_names.items():
+        df = df.drop_duplicates(subset=columns)
+        
+    # Replace empty cells with NaN
+    df["totalcharges"].replace("", np.nan, inplace=True)
+
+    # Convert 'totalcharges' to numeric, coercing errors
+    df["totalcharges"] = pd.to_numeric(df["totalcharges"], errors="coerce")
+    
+    #round up the totalcharges column to 2 decimal places
+    df["totalcharges"] = df["totalcharges"].round(2)
+    
+     #create connection to database
     connection = etl.create_db_connection(host_name="localhost", user_name="root", user_password="toor", db_name="telco_churn")  
    
     #extract column names
@@ -49,7 +62,10 @@ if __name__ == "__main__":
         query += ") VALUES ("
         for row in df[columns].values:
             for value in row:
-                if not isinstance(value, int):
+                # check if value is NaN and replace with NULL
+                if pd.isnull(value):
+                    query += "NULL, "
+                elif not isinstance(value, int):
                     query += f"'{value}', "
                 else:
                     query += f"{value}, "
@@ -58,3 +74,9 @@ if __name__ == "__main__":
         query = query.rstrip(", (")
         query += ";"
         print(query)
+        etl.insert_data_into_table(connection, query)
+    
+    for value in df["totalcharges"]:
+        if value == None:
+            print(value)
+
