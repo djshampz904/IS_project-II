@@ -80,3 +80,21 @@ def insert_data_into_table(connection, query):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
 
+#alter tables and add primary key
+def add_primary_key(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("Key added successfully")
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
+
+def drop_foreign_key(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("Key dropped successfully")
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")

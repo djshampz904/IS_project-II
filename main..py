@@ -4,11 +4,11 @@ import numpy as np
 
 if __name__ == "__main__":
     table_names = {
-                "customer_table": ["customerid", "gender", "seniorcitizen", "partner", "dependents"],
                 "service_table": ["customerid", "phoneservice", "multiplelines", "internetservice"],
                 "security_table": ["customerid", "onlinesecurity", "onlinebackup", "deviceprotection", "techsupport"],
                 "streaming_table": ["customerid", "streamingtv", "streamingmovies"],
-                "billing_table": ["customerid", "contract", "paperlessbilling", "paymentmethod", "monthlycharges", "totalcharges", "churn"]
+                "billing_table": ["customerid", "contract", "paperlessbilling", "paymentmethod", "monthlycharges", "totalcharges", "churn"],
+                "customer_table": ["customerid", "gender", "seniorcitizen", "partner", "dependents"]
     }
     
     file_path = "data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
@@ -40,11 +40,15 @@ if __name__ == "__main__":
     #print column names that are in the dictionary with key value customer_table
     total_columns = len(column_names)
     
+    #create table
     for table, columns in table_names.items():
+        #drop foreign key
         drop_query = f"DROP TABLE IF EXISTS {table};"
         etl.drop_table(connection, drop_query)
         
         query = f"CREATE TABLE {table} ("
+        if table != "customer_table":
+            query += f"id INT AUTO_INCREMENT PRIMARY KEY,"
         for i in range(total_columns):
             if column_names[i] in table_names[table]:
                 query += f" {column_names[i]} {column_types[i]},"
@@ -78,4 +82,10 @@ if __name__ == "__main__":
     for value in df["totalcharges"]:
         if value == None:
             print(value)
-
+            
+    #add primary keys to the tables
+    for table, columns in table_names.items():
+        if table == "customer_table":
+            query = f"ALTER TABLE {table} ADD PRIMARY KEY (customerid);"
+        
+        etl.add_primary_key(connection, query)
