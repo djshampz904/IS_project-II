@@ -45,7 +45,7 @@ if __name__ == "__main__":
         #drop foreign key
         drop_query = f"DROP TABLE IF EXISTS {table};"
         etl.drop_table(connection, drop_query)
-        
+
         query = f"CREATE TABLE {table} ("
         if table != "customer_table":
             query += f"id INT AUTO_INCREMENT PRIMARY KEY,"
@@ -55,30 +55,12 @@ if __name__ == "__main__":
         query = query.rstrip(",")  # remove trailing comma
         query += " )"
         etl.create_table(connection, query)
-        
-        
+
+
     #insert data into the database
     for table, columns in table_names.items():
-        query = f"INSERT INTO {table} ("
-        for column in table_names[table]:
-            query += f"{column}, "
-        query = query.rstrip(", ")
-        query += ") VALUES ("
-        for row in df[columns].values:
-            for value in row:
-                # check if value is NaN and replace with NULL
-                if pd.isnull(value):
-                    query += "NULL, "
-                elif not isinstance(value, int):
-                    query += f"'{value}', "
-                else:
-                    query += f"{value}, "
-            query = query.rstrip(", ")
-            query += "), ("
-        query = query.rstrip(", (")
-        query += ";"
-        etl.insert_data_into_table(connection, query)
-    
+        etl.insert_data_into_table(connection, df, table, columns)
+
     for value in df["totalcharges"]:
         if value == None:
             print(value)
@@ -87,5 +69,13 @@ if __name__ == "__main__":
     for table, columns in table_names.items():
         if table == "customer_table":
             query = f"ALTER TABLE {table} ADD PRIMARY KEY (customerid);"
+        else:
+            query = f"ALTER TABLE {table} ADD PRIMARY KEY (id);"
         
         etl.add_primary_key(connection, query)
+
+    #add foreign keys to the tables
+    for table, columns in table_names.items():
+        if table != "customer_table":
+            query = f"ALTER TABLE {table} ADD FOREIGN KEY (customerid) REFERENCES customer_table(customerid);"
+            etl.add_foreign_key(connection, query)

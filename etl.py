@@ -69,16 +69,26 @@ def drop_table(connection, query):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
 
-def insert_data_into_table(connection, query):
-    # clear the table
+def insert_data_into_table(connection, df, table, columns):
     """Insert data into a table"""
     cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-        print("Data inserted successfully")
-    except mysql.connector.Error as err:
-        print(f"Error: '{err}'")
+    for i in range(len(df)):
+        values = []
+        for column in columns:
+            value = df[column][i]
+            if type(value) == str:
+                value = f'"{value}"'
+            if pd.isna(value):
+                value = "NULL"
+            values.append(value)
+        values = ', '.join(map(str, values))
+        query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({values})"
+        try:
+            cursor.execute(query)
+            connection.commit()
+        except mysql.connector.Error as err:
+            print(f"Error: '{err}'")
+
 
 #alter tables and add primary key
 def add_primary_key(connection, query):
@@ -98,3 +108,22 @@ def drop_foreign_key(connection, query):
         print("Key dropped successfully")
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
+
+def check_duplicates_in_database(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("Duplicates checked successfully")
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
+
+def add_foreign_key(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        print("Foreign key added successfully")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        cursor.close()
