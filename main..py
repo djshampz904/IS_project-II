@@ -4,7 +4,7 @@ import numpy as np
 
 if __name__ == "__main__":
     table_names = {
-                "service_table": ["customerid", "phoneservice", "multiplelines", "internetservice"],
+                "service_table": ["customerid", "phoneservice", "multiplelines", "internetservice", "tenure"],
                 "security_table": ["customerid", "onlinesecurity", "onlinebackup", "deviceprotection", "techsupport"],
                 "streaming_table": ["customerid", "streamingtv", "streamingmovies"],
                 "billing_table": ["customerid", "contract", "paperlessbilling", "paymentmethod", "monthlycharges", "totalcharges", "churn"],
