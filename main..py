@@ -29,7 +29,7 @@ if __name__ == "__main__":
     df["totalcharges"] = df["totalcharges"].round(2)
     
      #create connection to database
-    connection = etl.create_db_connection(host_name="localhost", user_name="root", user_password="toor", db_name="telco_churn")  
+    connection = etl.create_db_connection(host_name="localhost", user_name="shvmpz", user_password="Pioneer.254", db_name="telco_churn")
    
     #extract column names
     column_names = etl.extract_column_names(df)
