@@ -1,12 +1,14 @@
 import pandas as pd
 import mysql.connector
 
+
 # The code will extract columns form csv and put them in a sql database
 
 def extract_data_from_csv(file_path):
     """Extract data from csv file and return a dataframe"""
     df = pd.read_csv(file_path, sep=',')
     return df
+
 
 def create_db_connection(host_name, user_name, user_password, db_name):
     """Create a connection to a database"""
@@ -23,12 +25,14 @@ def create_db_connection(host_name, user_name, user_password, db_name):
         print(f"Error: '{err}'")
     return connection
 
+
 def extract_column_names(df):
     """Extract column names from a dataframe"""
     column_names = []
     for column in map(str.lower, df.columns):
         column_names.append(column)
     return column_names
+
 
 def create_column_types(df):
     """Create column types for a database"""
@@ -51,6 +55,7 @@ def create_column_types(df):
             column_types.append('DATETIME')
     return column_types
 
+
 def create_table(connection, query):
     """Create a table in a database"""
     cursor = connection.cursor()
@@ -60,6 +65,7 @@ def create_table(connection, query):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
 
+
 def drop_table(connection, query):
     """Drop a table"""
     cursor = connection.cursor()
@@ -68,6 +74,7 @@ def drop_table(connection, query):
         print("Table dropped successfully")
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
+
 
 def insert_data_into_table(connection, df, table, columns):
     """Insert data into a table"""
@@ -100,6 +107,7 @@ def add_primary_key(connection, query):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
 
+
 def drop_foreign_key(connection, query):
     cursor = connection.cursor()
     try:
@@ -109,6 +117,7 @@ def drop_foreign_key(connection, query):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
 
+
 def check_duplicates_in_database(connection, query):
     cursor = connection.cursor()
     try:
@@ -117,6 +126,7 @@ def check_duplicates_in_database(connection, query):
         print("Duplicates checked successfully")
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
+
 
 def add_foreign_key(connection, query):
     cursor = connection.cursor()
